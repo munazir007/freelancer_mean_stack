@@ -1,28 +1,27 @@
 <div class="row">
 
-    <div class="col-md-4 col-sm-4" ng-repeat-start="job in jobs">
+    <div class="col-md-4 col-sm-4" ng-repeat-start="mark in marks">
 
         <article class="blog-teaser">
+            <a href="/jobs/{{mark.job._id}}/#top">
+                <header>
 
-            <a href="/jobs/{{job._id}}/#top">
-            <header>
-
-                <h3>{{job.service}}</h3>
-                <span class="meta">₹{{job.price_min}} - ₹{{job.price_max}}<br> {{job.city}}</span>
-                <hr>
-
-            </header>
+                    <h3>{{mark.job.service}}</h3>
+                    <span class="meta">₹{{mark.job.price_min}} - ₹{{mark.job.price_max}}<br> {{mark.job.city}}</span>
+                    <hr>
+                </header>
             </a>
 
-            <div  class="body">
+            <div class="body">
 
-                <b>No. of person: </b>{{job.person}}<br>
-                <b>Starting: </b>{{timeInWords(job.begin)}}
+                <b>No. of person: </b>{{mark.job.person}}<br>
+                <b>Starting: </b>{{timeInWords(mark.job.begin)}}<br>
                 <hr>
+
                 <div class="col-md-8 col-sm-8" >
-                    <a href="/user/{{job.user._id}}/jobs/#top">
-                        <img src="{{job.user.profile_pic}}" width=25" style="-webkit-border-radius: 20px;"/></a>
-                    &nbsp  &nbsp <span ng-if ="job.user._id == currentUser._id" class="dropdown active dropdown-toggle">
+                    <a href="/user/{{mark.user._id}}/jobs/#top">
+                        <img src="{{mark.user.profile_pic}}" width=25" style="-webkit-border-radius: 20px;"/></a>
+                    &nbsp  &nbsp <span ng-if ="mark.user._id == currentUser._id" class="dropdown active dropdown-toggle">
                         <a class="dropdown-toggle"
                            data-toggle="dropdown"
                            href="#">
@@ -34,16 +33,17 @@
                             <li><a href="blog-detail.html">Delete</a></li>
                         </ul>
                     </span>
-                    </div>
+                </div>
                 <div class="col-md-4 col-sm-4" align ="right">
 
-                <a href ="#"><i ng-click="postLike(job._id)" class="fa fa-star-o" aria-hidden="true"></i></a>
+                    <a href ="#"><i ng-click="postLike(job._id)" class="fa fa-star-o" aria-hidden="true"></i></a>
 
 
                 </div>
                 <br>
 
             </div>
+
             <div class="clearfix">
             </div>
         </article>

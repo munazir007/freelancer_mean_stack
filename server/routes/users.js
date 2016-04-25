@@ -8,6 +8,11 @@ router.get('/', function(req, res, next) {
         res.json(car);
     });
 });
+
+router.get('/cuser', function(req, res, next) {
+    res.json(req.user);
+});
+
 /* Transfer call to facebook */
 router.get('/auth/facebook', passport.authenticate('facebook'));
 /* Handle callback requests */
