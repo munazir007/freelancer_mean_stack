@@ -78,7 +78,7 @@
                             </a>
                             <ul  class="dropdown-menu">
                                 <li ng-if="notifications.length < 1"><a href="#">No new Notifications! </a></li>
-                                <li ng-repeat="notification in notifications"><a ng-click="checkNoti(notification._id)" href="/jobs/{{notification.job._id}}">{{notification.userfrom.name}} Commented on your {{notification.job.service}} Job</a></li>
+                                <li ng-repeat="notification in notifications"><a ng-click="checkNoti(notification._id, $index)" href="/jobs/{{notification.job._id}}">{{notification.userfrom.name}} Commented on your {{notification.job.service}} Job</a></li>
 
                             </ul>
                         </li>

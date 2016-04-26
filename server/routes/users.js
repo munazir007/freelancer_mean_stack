@@ -40,9 +40,10 @@ router.get('/user', function (req, res) {
     }
 });
 /* Demo login */
+
 router.get('/dlogin', function(req, res) {
     User.findOne({
-        _id: '57160325e8c4b5c410b41dc6'
+        name: 'Prashant Kumar'
     }, function(err, user) {
         if (err || !user) {
             return res.send('False');

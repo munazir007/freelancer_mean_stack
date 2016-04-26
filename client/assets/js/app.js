@@ -40,7 +40,7 @@ app.factory('UserJob', function ($resource) {
 );
 
 app.factory('MarkedJob', function ($resource) {
-        return $resource('/api/jobs/users/:userId/likes', null, {
+        return $resource('/api/jobs/users/:userId/likes/:lid', null, {
             'update': {method: 'PUT'}
         });
     }
@@ -68,7 +68,7 @@ app.factory('Like', function ($resource) {
 );
 
 
-app.controller('JobController', function ($scope, $rootScope, $http, $routeParams, Job, Comment, Notification) {
+app.controller('JobController', function ($scope, $rootScope, $http, socket, $routeParams, Job, Comment, Notification) {
     $scope.jobObject = {};
     if ($routeParams.jobid) {
         $scope.jobSingle = Job.get({jobid: $routeParams.jobid});
@@ -99,6 +99,10 @@ app.controller('JobController', function ($scope, $rootScope, $http, $routeParam
             })
     }
 
+    socket.on('comment', function (comment) {
+        $scope.comments.push(comment);
+    });
+
 
     // Moment js
     $rootScope.timeInWords = function (date) {
@@ -122,12 +126,14 @@ app.controller('JobController', function ($scope, $rootScope, $http, $routeParam
 
 });
 
-app.controller('UserJobController', function ($scope, $rootScope, $http, $routeParams, UserJob) {
+app.controller('UserJobController', function ($scope, $rootScope, socket, $http, $routeParams, UserJob) {
     $scope.jobs = UserJob.query({userId: $routeParams.userId});
+
+
 });
 
 
-app.controller('MarkJobController', function ($scope, $rootScope, $http, $routeParams, MarkedJob) {
+app.controller('MarkJobController', function ($scope, $rootScope, socket, $http, $routeParams, MarkedJob) {
     $scope.marks = MarkedJob.query({userId: $routeParams.userId});
 
     $rootScope.timeInWords = function (date) {
@@ -135,7 +141,7 @@ app.controller('MarkJobController', function ($scope, $rootScope, $http, $routeP
     };
 });
 
-app.controller('ViewController', function ($scope, $routeParams, $rootScope, $http, Job, socket, Like, Notification) {
+app.controller('ViewController', function ($scope, $routeParams, $rootScope,  $http, Job, socket, Like, Notification) {
     $scope.jobs = Job.query();
 
 
@@ -149,12 +155,26 @@ app.controller('ViewController', function ($scope, $routeParams, $rootScope, $ht
                 console.log(err);
             });
 
-            $rootScope.checkNoti = function (notId) {
+            $rootScope.checkNoti = function (notId, index) {
                 Notification.remove({nId: notId, userId: $rootScope.currentUser._id}, function (notification, err) {
                     if(notification.error){
                         console.log(err);
                     }
+                    $scope.notifications.splice(index, 1);
                 });
+
+            };
+
+
+            $rootScope.delJob = function (jobId, index) {
+                Job.remove({jobid: jobId}, function (job, err) {
+                    if(job.error){
+                        console.log(err);
+                    }
+                    $scope.jobs.splice(index, 1);
+                });
+
+
 
             };
 
@@ -166,6 +186,10 @@ app.controller('ViewController', function ($scope, $routeParams, $rootScope, $ht
     $scope.timeInWords = function (date) {
         return moment(date).fromNow();
     };
+
+    socket.on('notification', function (notification) {
+        $scope.notifications.push(notification);
+    });
 
     socket.on('job', function (job) {
         $scope.jobs.push(job);

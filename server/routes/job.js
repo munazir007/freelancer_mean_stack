@@ -80,10 +80,23 @@ module.exports = function (io) {
 
     });
 
+    router.delete('/users/:id/likes/:lid', function (req, res) {
+
+        Like.findOneAndRemove({_id: req.params.lid}, function (err, like) {
+            if (err) {
+                return res.json(err);
+            }
+            return res.json(like);
+        })
+
+    });
+
+
+
     router.get('/:id/comments', function (req, res) {
         Comment.find({job: req.params.id})
             .populate('user')
-            .sort('-created_at')
+
             .exec(function (err, comments) {
                 if (err) {
                     return res.json({error: err});
@@ -118,14 +131,20 @@ module.exports = function (io) {
                         notification.userto = job.user;
                         if(notification.userfrom == notification.userto){
                             comment.user = req.user;
+                            io.emit('comment', comment);
                             res.json(comment);
                         }
                         else{
                         notification.save(function (err, notification) {
                             if(err){
                                 console.log(err);
-                                return res.send({error: err});                            }
+                                return res.send({error: err});
+                            }
                             comment.user = req.user;
+                            notification.userfrom = req.user;
+                            notification.job = job;
+                            io.emit('comment', comment);
+                            io.emit('notification', notification);
                             res.json(comment);
                         });
                         }
