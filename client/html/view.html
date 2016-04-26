@@ -9,17 +9,15 @@
 
                 <h3>{{job.service}}</h3>
                 <span class="meta">₹{{job.price_min}} - ₹{{job.price_max}}<br> {{job.city}}</span>
-                <hr>+
+                <hr>
 
             </header>
             </a>
-
+ss
             <div  class="body">
 
                 <b>No. of person: </b>{{job.person}}<br>
-                <b>Locality: </b>{{job.locality}}<br>
-                <b>Starting: </b>{{timeInWords(job.begin)}}<br>
-                <b>Duration: </b>{{job.duration}}&nbspdays <br>
+                <b>Starting: </b>{{timeInWords(job.begin)}}
                 <hr>
                 <div class="col-md-8 col-sm-8" >
                     <a href="/user/{{job.user._id}}/jobs/#top">
