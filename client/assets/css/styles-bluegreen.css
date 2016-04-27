@@ -5,6 +5,7 @@ body {
   font-family: 'Open Sans', sans-serif;
   color: #404b55;
   background-color: #feffff;
+
 }
 a {
   color: #5b6268;
@@ -35,9 +36,7 @@ hr {
   border-top-color: #ced5db;
 }
 /* Font Awesome Icons */
-.fa {
-  font-size: 24px;
-}
+
 ::selection {
   background: #566572;
   /* Safari */

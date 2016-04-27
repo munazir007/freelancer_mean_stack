@@ -1,11 +1,13 @@
 /**
  * Created by pritish on 14-04-2016.
  */
-module.exports = function(io) {
+module.exports = function (io) {
     var express = require('express');
     var router = express.Router();
     var Job = require('../models/job');
     var Comment = require('../models/comments');
+    var Like = require('../models/likes');
+    var Notification = require('../models/notifications');
 
     router.get('/', function (req, res) {
         Job.find({})
@@ -78,15 +80,28 @@ module.exports = function(io) {
 
     });
 
+    router.delete('/users/:id/likes/:lid', function (req, res) {
+
+        Like.findOneAndRemove({_id: req.params.lid}, function (err, like) {
+            if (err) {
+                return res.json(err);
+            }
+            return res.json(like);
+        })
+
+    });
+
+
+
     router.get('/:id/comments', function (req, res) {
         Comment.find({job: req.params.id})
             .populate('user')
-            .sort('-created_at')
-            .exec(function (err, jobs) {
+
+            .exec(function (err, comments) {
                 if (err) {
                     return res.json({error: err});
                 }
-                return res.json(jobs)
+                return res.json(comments)
             });
     })
 
@@ -102,17 +117,124 @@ module.exports = function(io) {
             comment.job = req.params.id;
             comment.save(function (err, comment) {
                 if (err || !comment) {
-                    res.json({error: 'comment not posted'});
+                    console.log(err);
+                    return res.json({error: 'comment not posted'});
                 } else {
-                    comment.user = req.user;
-                    res.json(comment);
+                    Job.findOne({_id: req.params.id}, function (err, job) {
+                        if(err){
+                            console.log(err);
+                            return res.send({error: err});
+                        }
+                        var notification = new Notification();
+                        notification.userfrom = req.user._id;
+                        notification.job = req.params.id;
+                        notification.userto = job.user;
+                        if(notification.userfrom == notification.userto){
+                            comment.user = req.user;
+                            io.emit('comment', comment);
+                            res.json(comment);
+                        }
+                        else{
+                        notification.save(function (err, notification) {
+                            if(err){
+                                console.log(err);
+                                return res.send({error: err});
+                            }
+                            comment.user = req.user;
+                            notification.userfrom = req.user;
+                            notification.job = job;
+                            io.emit('comment', comment);
+                            io.emit('notification', notification);
+                            res.json(comment);
+                        });
+                        }
+                    })
+                }
+            });
+        }
+
+    });
+
+
+    router.get('/users/:id/likes', function (req, res) {
+        Like.find({user: req.params.id})
+            .populate('job user')
+
+            .exec(function (err, likes) {
+                if (err) {
+                    return res.json({error: err});
+                }
+                return res.json(likes)
+            });
+    })
+
+    router.post('/users/:id/likes', function (req, res) {
+
+        if (!req.user) {
+            res.json({error: 'Not signed in'});
+        } else {
+
+            var like = new Like();
+            like.user = req.user._id;
+            like.job = req.params.id;
+            like.save(function (err, like) {
+                if (err || !like) {
+                    res.json({error: 'not liked'});
+                } else {
+
+                    res.json(like);
                 }
 
             });
+
 
         }
 
     });
 
-return router;
+
+    //notifications for a user
+    router.get('/users/:id/notifications', function (req, res) {
+        Notification.find({userto: req.params.id})
+
+             .populate('job userfrom userto')
+            .exec(function (err, notifications) {
+                if (err) {
+                    return res.json({error: err});
+                }
+                return res.json(notifications)
+            });
+    })
+
+    //delete a notification
+
+    router.delete('/users/:id/notifications/:nId', function (req, res) {
+
+        Notification.findOneAndRemove({_id: req.params.nId}, function (err, notification) {
+            if (err) {
+                return res.json(err);
+            }
+            return res.json(notification);
+        })
+
+    });
+
+
+    //return all posted jobs by a user
+    router.get('/users/:id/jobs', function (req, res) {
+
+        Job.find({userto: req.params.id})
+            .populate('user')
+            .exec(function (err, jobs) {
+                if (err) {
+                    console.log(err);
+                    return res.json({error: 'Error'});
+                }
+                res.json(jobs);
+            });
+
+
+    });
+
+    return router;
 }

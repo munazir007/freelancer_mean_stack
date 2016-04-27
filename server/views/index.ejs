@@ -69,6 +69,19 @@
             <nav class="pull-right tales-nav">
                 <div class="collapse navbar-collapse">
                     <ul class="nav nav-pills navbar-nav">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                <i class="fa fa-bell" aria-hidden="true"></i> <span ng-if="notifications.length > 0">{{notifications.length}}</span>
+
+                            </a>
+                            <ul  class="dropdown-menu">
+                                <li ng-if="notifications.length < 1"><a href="#">No new Notifications! </a></li>
+                                <li ng-repeat="notification in notifications"><a ng-click="checkNoti(notification._id, $index)" href="/jobs/{{notification.job._id}}">{{notification.userfrom.name}} Commented on your {{notification.job.service}} Job</a></li>
+
+                            </ul>
+                        </li>
 
                         <li class="active">
                             <a href="/">
@@ -78,6 +91,18 @@
                         </li>
                         <li>
                             <a href="/postjob">Post &nbspJob</a>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="#">
+                                Activites
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/user/{{currentUser._id}}/jobs/#top">Jobs By Me</a></li>
+                                <li><a href="/user/{{currentUser._id}}/markedjobs/#top">Jobs Marked</a></li>
+                            </ul>
                         </li>
                         <li>
                             <a href="/api/users/logout">Logout</a>
@@ -95,12 +120,12 @@
 <div class="widewrapper main">
     <div class="container">
         <div class="row">
-            <div ng-view class="col-md-8 blog-main">
+            <div ng-view class="col-md-9 blog-main">
 
             </div>
-            <aside class="col-md-4 blog-aside">
+            <aside class="col-md-3 blog-aside">
 
-                <div class="aside-widget">
+                <div  class="aside-widget">
                     <header>
                         <h3>Search Jobs</h3>
                     </header>
